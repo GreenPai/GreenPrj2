@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="User">  
+  
+  <!-- 회원가입 -->
+ <insert id="UserInsert">
+   
+       INSERT INTO tuser (
+		    userid,
+		    passwd,
+		    username,
+		    email,
+		    indate
+		) VALUES (
+		    #{ userid    },
+		    #{ passwd    },
+		    #{ username  },
+		    #{ email     },
+		    SYSDATE
+		)       
+   
+   </insert>
+   
+   <!-- 회원목록조회 -->
+   <select id="getUserList"
+           resultType="com.green.user.vo.UserVo">
+      SELECT  
+        USERID,
+        PASSWD,
+        USERNAME,
+        EMAIL,  
+        TO_CHAR(INDATE, 'YYYY-MM-DD') INDATE
+	  FROM  TUSER
+	  ORDER BY USERID    
+   </select>
+   
+   <!-- 회원개인조회 -->
+   <select id="getUser"
+           resultType="com.green.user.vo.UserVo">
+     SELECT 
+         USERID,
+         PASSWD,
+         USERNAME,
+         EMAIL,  
+         TO_CHAR(INDATE, 'YYYY-MM-DD HH24:MI:SS') INDATE
+      FROM   TUSER
+      WHERE  USERID = #{ userid }  
+   </select>
+   
+   <!-- 회원삭제 -->
+   <delete id="UserDelete">
+      
+      DELETE 
+        FROM   TUSER
+        WHERE  USERID = #{userid}
+   
+   </delete>
+ 
+   <!-- 회원수정 -->
+   <update id="UserUpdate">
+   
+   	   UPDATE  TUSER
+   	     SET   USERNAME =  #{ username },
+   	           EMAIL    =  #{ email }   	     
+   	    WHERE  USERID   =  #{ userid } 
+   	    AND    PASSWD   =  #{ passwd } 
+   
+   </update>
+ 
+ 
+</mapper>
+
+
+
+
+
+   

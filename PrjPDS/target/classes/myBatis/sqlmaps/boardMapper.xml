@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board">  
+  
+   <select  id         = "BoardList"   
+            resultType = "com.green.board.vo.BoardVo">
+      
+     SELECT      
+        IDX
+      , MENU_ID
+      , TITLE
+      , CONT
+      , WRITER
+      , TO_CHAR(REGDATE, 'YYYY-MM-DD')  REGDATE
+      , READCOUNT
+      , BNUM
+      , LVL
+      , STEP
+      , NREF
+	 FROM       BOARD
+	 WHERE      MENU_ID = #{ menu_id } 
+	 ORDER  BY  NREF  DESC,  STEP  ASC 
+  
+   </select>
+   
+   <select id="BoardView"
+           resultType="com.green.board.vo.BoardVo">
+      SELECT      
+        IDX
+      , MENU_ID
+      , TITLE
+      , CONT
+      , WRITER
+      , TO_CHAR(REGDATE, 'YYYY-MM-DD')  REGDATE
+      , READCOUNT
+      , BNUM
+      , LVL
+      , STEP
+      , NREF
+ FROM       BOARD
+ WHERE      IDX   =  #{ idx  }
+      
+   
+   </select>
+   
+   <!-- 새 게시글 추가 -->
+   <insert id="BoardInsert">
+   
+     INSERT  INTO  BOARD (
+      IDX, 
+      MENU_ID, 
+      TITLE, 
+      CONT, 
+      WRITER,
+      BNUM,
+      LVL,
+      STEP,
+      NREF
+    )  VALUES  (  
+      ( SELECT NVL(MAX(IDX), 0)+1  FROM  BOARD ),
+      #{ menu_id },
+      #{ title   },
+      #{ cont    },
+      #{ writer  },
+      ( SELECT NVL(MAX(BNUM), 0)+1  FROM  BOARD ),  
+      0,
+      0,
+      ( SELECT NVL(MAX(NREF), 0)+ 1 FROM  BOARD )
+    )
+   
+   </insert>
+   
+   <!--  step 값 증가 -->
+   <update id="StepUpdate">
+   
+     UPDATE  BOARD   
+      SET    STEP  =   STEP + 1
+      WHERE  NREF  =   #{ nref  }
+       AND   STEP  >   #{ step }
+   
+   </update>
+   
+   <!-- 답글 추가 -->
+   <insert id="BoardReply">
+   
+     INSERT  INTO  BOARD (
+      IDX, 
+      MENU_ID, 
+      TITLE, 
+      CONT, 
+      WRITER,
+      BNUM,
+      LVL,
+      STEP,
+      NREF
+    )  VALUES  (  
+      ( SELECT NVL(MAX(IDX), 0)+1  FROM  BOARD ),
+      #{ menu_id  },
+      #{ title    },
+      #{ cont     },
+      #{ writer   },
+      #{ bnum     },  
+      #{ lvl      } + 1 ,
+      #{ step     } + 1 ,
+      #{ nref     }
+    )
+   
+   </insert>
+   
+   <update id="BoardUpdate">
+   
+      UPDATE     BOARD
+	    SET      TITLE = #{ title }
+	           , CONT  = #{ cont  }
+	    WHERE    IDX   = #{ idx } 
+   
+   </update>
+   
+   <delete id="BoardDelete">
+   
+       DELETE   FROM  BOARD
+         WHERE  IDX  =  #{ idx  }  
+   
+   </delete>
+     
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   

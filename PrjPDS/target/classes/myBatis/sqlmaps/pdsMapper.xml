@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pds">  
+  
+   <select  id         = "PdsList"   
+            resultType = "com.green.pds.vo.PdsVo">
+      
+      SELECT
+		    IDX,
+		    MENU_ID,
+		    TITLE, 
+		    WRITER,
+		    READCOUNT,
+		    (  SELECT   COUNT(FILE_NUM) 
+		         FROM   FILES  F
+		         WHERE  F.IDX   =  B.IDX  )  FILESCOUNT,
+		    TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS')  REGDATE,
+		    BNUM,
+		    LVL,
+		    STEP,
+		    NREF
+		FROM
+		    BOARD  B
+		WHERE 
+		    MENU_ID  = #{ menu_id  }
+		ORDER  BY   NREF  DESC,  STEP ASC         
+		  
+   </select>
+   
+   <select id="PdsView"
+           resultType="com.green.pds.vo.PdsVo">
+   
+     SELECT   
+	    IDX,
+	    MENU_ID,
+	    TITLE,
+	    CONT,
+	    WRITER,
+	    TO_CHAR(REGDATE, 'YYYY-MM-DD HH24:MI:SS') REGDATE,
+	    READCOUNT,
+	    BNUM,
+	    LVL,
+	    STEP,
+	    NREF
+	 FROM
+        BOARD
+     WHERE
+        IDX = #{ idx }   
+   
+   </select>
+   
+   <select id="FileList"
+           resultType="com.green.pds.vo.FilesVo">
+      
+      SELECT   
+          FILE_NUM,  IDX,  FILENAME,  FILEEXT,  SFILENAME
+       FROM
+          FILES
+       WHERE   
+          IDX   =   #{ idx }          
+        
+   </select>
+   
+   <insert id="PdsInsert">
+      
+      INSERT  INTO   BOARD (
+           IDX
+         , MENU_ID
+         , TITLE
+         , CONT
+         , WRITER
+         , REGDATE
+         , READCOUNT
+         , BNUM
+         , LVL
+         , STEP
+         , NREF 
+      )
+      VALUES
+      (
+           ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD)
+         , #{ menu_id }
+         , #{ title   }
+         , #{ cont    }
+         , #{ writer  }
+         , SYSDATE
+         , 0
+         , ( SELECT  NVL(MAX(BNUM),0)+1 FROM BOARD)
+         , 0
+         , 0
+         , ( SELECT  NVL(MAX(NREF),0)+1 FROM BOARD)
+      )
+      
+   </insert>
+   
+   <update  id="StepUpdate">
+   
+      UPDATE   BOARD
+        SET    STEP     =  STEP + 1
+        WHERE  MENU_ID  =  #{ menu_id }
+	    AND    NREF     =  #{ nref    }
+	    AND    STEP     >  #{ step }  
+   
+   </update>
+   
+   <insert id="PdsReply">
+    
+      INSERT  INTO   BOARD (
+           IDX
+         , MENU_ID
+         , TITLE
+         , CONT
+         , WRITER
+         , REGDATE
+         , READCOUNT
+         , BNUM
+         , LVL
+         , STEP
+         , NREF 
+      )
+      VALUES
+      (
+           ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD)
+         , #{ menu_id }
+         , #{ title   }
+         , #{ cont    }
+         , #{ writer  }
+         , SYSDATE
+         , 0
+         , #{ bnum }
+         , #{ lvl  } + 1
+         , #{ step } + 1
+         , #{ nref }
+      )
+   
+   </insert>
+   
+   <!-- FileInsert -->
+   <insert id="FileInsert">
+   
+     <foreach item="file"  collection="fileList"
+         index     =  "i"
+         open      =  "INSERT ALL"     
+         close     =  "SELECT *  FROM DUAL"
+         separator  =  " ">
+     INTO   FILES   VALUES (
+        GET_FILENUM() 
+		, ( SELECT  MAX(IDX)   FROM BOARD  )
+		, #{ file.filename   }     
+		, #{ file.fileext    }     
+		, #{ file.sfilename  }     
+     )   
+     
+     </foreach>     
+   
+   </insert>
+   
+   <delete id="PdsDelete">
+     
+     DELETE  FROM BOARD
+      WHERE  IDX = #{ idx  }
+   
+   </delete>
+   
+   <delete id="FileDelete">
+   
+     DELETE  FROM  FILES
+      WHERE  IDX = #{ idx  }
+   
+   </delete>
+   
+  
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
