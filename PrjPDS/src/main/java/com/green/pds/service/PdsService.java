@@ -20,4 +20,8 @@ public interface PdsService {
 
 	void setDelete(HashMap<String, Object> map);
 
+	void deleteUploadFile(HashMap<String, Object> map);
+
+	void setUpdate(HashMap<String, Object> map, HttpServletRequest request);
+
 }

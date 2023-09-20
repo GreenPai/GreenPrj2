@@ -172,6 +172,17 @@
    
    </delete>
    
+    <delete id="FileDelete2">
+   
+     DELETE  FROM       FILES
+      WHERE  FILE_NUM = #{ file_num  }
+   
+   </delete>
+   
+  
+  
+  
+  
   
 </mapper>
 

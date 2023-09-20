@@ -192,10 +192,12 @@ public class PdsController {
     	mv.addObject("map"     , map );
     	return mv;
     }
-	
-	
-	
-		
+    
+    
+    //--------------------------------------
+    //  /Pds/deleteFile?num=12&sfile=flower_1.jsp
+  
+  	
    //---------------------------------------------------
    // 다운로드
    // type : external, internal
@@ -255,6 +257,22 @@ public class PdsController {
       
       
    }
+   
+   @RequestMapping("/Update")
+   public ModelAndView update(
+		   @RequestParam HashMap<String, Object> map,
+		   HttpServletRequest                    request) {
+	  
+	   pdsService.setUpdate( map, request );
+	   
+	  String       menu_id  = String.valueOf(map.get("menu_id")); 	   
+	   
+	  ModelAndView mv       = new ModelAndView();
+	  mv.setViewName("redirect:/Pds/List?menu_id=" + menu_id );
+	  return mv;
+	   
+   }
+   
 } 
 
 

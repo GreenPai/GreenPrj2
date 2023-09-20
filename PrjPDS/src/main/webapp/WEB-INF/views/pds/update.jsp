@@ -13,17 +13,25 @@
 <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
 <link rel="stylesheet" href="/css/common.css"   />
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
 <style>
    input  { height: 32px;  }  
    
-   #table  th                      {  width  : 15%;  }  
-   #table  td                      {  width  : 35%;  }  
-   #table  tr:nth-of-type(4)       {  height : 300px;  vertical-align: top; }  
-   #table  tr:nth-of-type(5)       {  height : 200px;  vertical-align: top; }  
-   #table  tr:nth-of-type(6)  td   {  text-align: center;  }  
+   #table1  th                      {  width  : 15%;  }  
+   #table1  td                      {  width  : 35%;  }  
+   #table1  tr:nth-of-type(4)       {  height : 300px;  vertical-align: top; }  
+   #table1  tr:nth-of-type(5)       {  height : 200px;  vertical-align: top; }  
+   #table1  tr:nth-of-type(6)  td   {  text-align: center;  }  
      
+    input[type="text"]             { width : }
+    textarea                       { width : 100%; height: 300px; } 
+    
+    h2  { text-align: center; margin : 20px;}
+    
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery.min.js"></script>
 
 <script>
@@ -35,8 +43,28 @@
 		   $('#tdfile').append( tag );
 		   num++;
 	   })
-   })
 
+   $('.aDelete').on('click', function(e) {   // a tag :  ❌ click
+	   e.preventDefault(); // 페이지 이동기능 방지
+	   e.stopPropagation();
+	   let aDelete = this;
+       console.dir(aDelete);	   
+	   
+	   $.ajax({
+		   url   : this.href // aDelete.href 
+		   method: 'GET'
+	   })
+	   .done( function( result ) {
+		  // alert('삭제완료')
+		   $(aDelete).parent().remove()
+	   })
+	   .fail( function( error ) {
+		   alert(error);
+	   });
+	   
+   })
+})   
+   
 </script>
 
 </head>
@@ -46,11 +74,14 @@
   <!-- 메뉴 목록 -->
   <%@include file="/WEB-INF/include/pdsmenus.jsp" %>
   
-  <table id="table">
-   <caption>
+  <form action="/Pds/Update" method="POST"
+        enctype="multpart/form-data" >
+  <input type=hidden" name="idx" value="${map.idx}" />
+  <input type=hidden" name="menu_id" value="${map.menu_id}" />  
+  <table id="table1">
+
      <h2>${ menuname } 자료실 내용 보기</h2>
-   </caption>
-   
+
    <tr>
    	<th>글번호</th>
    	<td>${ vo.idx }</td>
@@ -66,13 +97,14 @@
    <tr>
     <th>제목</th>
     <td colspan="3">
+       <input type="text" name="title" value="${vo.title}" />
        ${ vo.title }
     </td>
    </tr>   
    <tr>
     <th>내용</th>
     <td colspan="3">
-       ${ vo.cont }
+       <textarea name="">${vo.cont}</textarea>
     </td>
    </tr>  
    <tr>
@@ -81,27 +113,32 @@
       
       <c:forEach var="file" items="${ fileList }">
         <div>
+          <a class  ="aDelete"
+             href ="/deleteFile?file_num=${file.file_num}&sfile=${ file.sfilename}">
+          ❌❌
+          </a>
           <a href="/Pds/download/external/${ file.sfilename }">
             ${ file.filename } 
           </a>        
         </div>
       </c:forEach>
+      <br>
+      
+      <!--  새 파일 추가 -->
+      <input type="button"  class="form-control" id="btnAddFile" value="파일추가(100M 까지)" /><br>
+      <input type="file"  name="upfile"   class="form-control" /><br>
       
     </td>
    </tr>
    <tr>
     <td colspan="4">
-      <a href="/Pds/WriteForm?menu_id=${ map.menu_id }&bnum=${ map.bnum }">새글쓰기</a>&nbsp;&nbsp;
-      <a href="/Pds/WriteForm?menu_id=${ map.menu_id }&idx=${ vo.idx }&bnum=${ vo.bnum }&lvl=${ vo.lvl }&step=${ vo.step }&nref=${ vo.nref }">답글쓰기</a>&nbsp;&nbsp;
-      <a href="/Pds/UpdateForm?menu_id=${ map.menu_id }&idx=${ vo.idx }">수정</a>&nbsp;&nbsp;
-      <a href="/Pds/Delete?menu_id=${ map.menu_id }&idx=${ vo.idx }">삭제</a>&nbsp;&nbsp;
-      <a href="/Pds/List?menu_id=${ map.menu_id }">목록으로</a>&nbsp;&nbsp;
-      <a href="/">HoMe</a>
+      <a class="btn btn-primary-sm" href="#" role="button">수정</a>
+      <a class="btn btn-primary-sm" href="/" role="button">Home</a>
     </td>
    </tr>
     
   </table>
-  
+</form>  
   </main>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.green.pds.service.impl;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,6 +79,33 @@ public class PdsServiceImpl implements PdsService {
 		List<FilesVo>  fileList  =  (List<FilesVo>) map.get("fileList"); 
 		// IDX 에 해당 파일을 삭제
 		PdsFile.delete( fileList );
+		
+	}
+
+	// /deleteFile?file_num
+	@Override
+	public void deleteUploadFile(HashMap<String, Object> map) {
+		
+		//Files 에서 삭제 
+		pdsDao.deleteUploadFile(map);
+		
+		// d:\\dev\\data\\flower_1.jpg 삭제
+		String filepath  = "d:\\dev\\data\\";
+		String sfilename = String.valueOf(map.get("sfile"));
+		
+		File file = new File(sfilename + sfilename);
+		if ( file.exists() )
+			file.delete();
+	}
+
+	@Override
+	public void setUpdate(HashMap<String, Object> map, HttpServletRequest request) {
+		
+		// 1. request 넘어온 파일 저장
+		PdsFile.save(map, request);
+		
+		// 2. db에 정보를 저장(Board, Files)
+		pdsDao.setUpdate( map );
 		
 	}
 

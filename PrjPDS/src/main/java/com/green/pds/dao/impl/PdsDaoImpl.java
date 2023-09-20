@@ -88,6 +88,25 @@ public class PdsDaoImpl implements PdsDao {
 		
 	}
 
+	@Override
+	public void deleteUploadFile(HashMap<String, Object> map) {
+		
+		sqlSession.delete("Pds.FileDelete2",map);
+	}
+
+	@Override
+	public void setUpdate(HashMap<String, Object> map) {
+		
+		// 1. Board 정보 수정
+		sqlSession.update( "Pds.PdsUpdate", map);
+		
+		// 2. Files 에 데이터 추가
+		List<FilesVo>  fileList =  (List<FilesVo>) map.get("fileList");
+		if( fileList.size() != 0 )
+			sqlSession.insert("Pds.FileInsert", map);
+		
+	}
+
 }
 
 
